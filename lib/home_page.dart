@@ -26,12 +26,21 @@ class _HomePageState extends State<HomePage> {
     dataList = dbProvider!.getTodoList();
   }
 
+  bool toBoolean(String str, [bool strict = false]) {
+    if (strict == true) {
+      return str == '1' || str == 'true';
+    }
+    return str != '0' && str != 'false' && str != '';
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool todoStat;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo'),
         centerTitle: true,
+        leading: const Icon(Icons.code),
       ),
       body: Column(
         children: [
@@ -53,45 +62,84 @@ class _HomePageState extends State<HomePage> {
                           itemCount: snapshot.data?.length,
                           itemBuilder: (context, index) {
                             int todoId = snapshot.data![index].id!.toInt();
-                            String todoTitle = snapshot.data![index].title!.toString();
-                            String todoDesc = snapshot.data![index].desc!.toString();
-                            String todoDate = snapshot.data![index].dateTime!.toString();
-                            return ListTile(
-                              title: Text(todoTitle),
-                              subtitle: Text(todoDesc),
-                              // trailing: Row(
-                              //   children: <Widget>[
-                              //     IconButton(onPressed: (){
-                              //       Navigator.push(context,
-                              //           MaterialPageRoute(
-                              //               builder: (context)=>AddTodo(
-                              //                 todoId: todoId,
-                              //                 todoTitle: todoTitle,
-                              //                 todoDesc: todoDesc,
-                              //                 todoDateTime: todoDate,
-                              //               )));
-                              //     }, icon: const Icon(Icons.edit)),
-                              //     IconButton(onPressed: (){
-                              //       setState(() {
-                              //         dbProvider!.deleteTodo(todoId);
-                              //         dataList = dbProvider!.getTodoList();
-                              //         snapshot.data!.remove(snapshot.data![index]);
-                              //       });
-                              //     }, icon: const Icon(Icons.delete))
-                              //   ],
-                              // ),
+                            String todoTitle =
+                                snapshot.data![index].title!.toString();
+                            String todoDesc =
+                                snapshot.data![index].desc!.toString();
+                            String todoDate =
+                                snapshot.data![index].dateTime!.toString();
+                            int? todoStatus = snapshot.data![index].status;
+                            todoStat = (todoStatus == 1)? true : false;
+                            return Dismissible(
+                              key: UniqueKey(),
+                              background: Container(color: Colors.red),
+                              onDismissed: (DismissDirection direction) {
+                                setState(() {
+                                  dbProvider!.deleteTodo(todoId);
+                                  dataList = dbProvider!.getTodoList();
+                                  snapshot.data!.remove(snapshot.data![index]);
+                                });
+                              },
+                              child: CheckboxListTile(
+                                  title: Text(todoTitle),
+                                  subtitle: Text(todoDesc),
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  selected: todoStat,
+                                  secondary: IconButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => AddTodo(
+                                                  todoId: todoId,
+                                                  todoTitle: todoTitle,
+                                                  todoDesc: todoDesc,
+                                                  todoDateTime: todoDate,
+                                                  todoUpdate: true,
+                                                  todoStat: todoStat,
+                                                )));
+                                      },
+                                      icon: const Icon(Icons.edit)),
+                                value: todoStat,
+                                onChanged: (value) {
+                                    setState(() {
+                                      todoStat = value!;
+                                    });
+                                },
+                              ),
                             );
+                            // trailing: Row(
+                            //   children: <Widget>[
+                            //     IconButton(onPressed: (){
+                            //       Navigator.push(context,
+                            //           MaterialPageRoute(
+                            //               builder: (context)=>AddTodo(
+                            //                 todoId: todoId,
+                            //                 todoTitle: todoTitle,
+                            //                 todoDesc: todoDesc,
+                            //                 todoDateTime: todoDate,
+                            //               )));
+                            //     }, icon: const Icon(Icons.edit)),
+                            //     IconButton(onPressed: (){
+                            //       setState(() {
+                            //         dbProvider!.deleteTodo(todoId);
+                            //         dataList = dbProvider!.getTodoList();
+                            //         snapshot.data!.remove(snapshot.data![index]);
+                            //       });
+                            //     }, icon: const Icon(Icons.delete))
+                            //   ],
+                            // ),
                           });
                     }
                   }))
         ],
       ),
-      floatingActionButton:
-      FloatingActionButton(onPressed: () {
-        Navigator.push(
-            context, MaterialPageRoute(
-            builder: (context) => AddTodo()));
-      }, child: const Icon(Icons.add)),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AddTodo()));
+          },
+          child: const Icon(Icons.add)),
     );
   }
 }
