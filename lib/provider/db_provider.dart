@@ -27,7 +27,7 @@ class DBProvider {
   }
 
   _createDatabase(Database database, int version) async {
-    await database.execute("CREATE TABLE mytodos(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT NOT NULL,status INTEGER,desc TEXT NOT NULL,dateTime TEXT NOT NULL);");
+    await database.execute("CREATE TABLE mytodos(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, completed INTEGER NOT NULL);");
   }
 
   Future<TodoModel> insertTodo(TodoModel todoModel) async {

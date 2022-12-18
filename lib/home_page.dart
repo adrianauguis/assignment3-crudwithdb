@@ -2,6 +2,7 @@ import 'package:assignment_auguis_test/provider/db_provider.dart';
 import 'package:flutter/material.dart';
 import 'add_todo.dart';
 import 'model/todo_model.dart';
+import 'provider/todo_api_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,11 +20,17 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     dbProvider = DBProvider();
+    loadFromApi();
     loadData();
   }
 
   loadData() {
     dataList = dbProvider!.getTodoList();
+  }
+
+  loadFromApi() async {
+    var apiProvider = TodoApiProvider();
+    await apiProvider.getAllTodos();
   }
 
   bool toBoolean(String str, [bool strict = false]) {
@@ -64,12 +71,10 @@ class _HomePageState extends State<HomePage> {
                             int todoId = snapshot.data![index].id!.toInt();
                             String todoTitle =
                                 snapshot.data![index].title!.toString();
-                            String todoDesc =
-                                snapshot.data![index].desc!.toString();
-                            String todoDate =
-                                snapshot.data![index].dateTime!.toString();
-                            int? todoStatus = snapshot.data![index].status;
-                            todoStat = (todoStatus == 1)? true : false;
+                            // int todoUserId =
+                            //     snapshot.data![index].userId!.toInt();
+                            int? todoCompleted = snapshot.data![index].completed!.toInt();
+                            todoStat = (todoCompleted == 1)? true : false;
                             return Dismissible(
                               key: UniqueKey(),
                               background: Container(color: Colors.red),
@@ -82,7 +87,7 @@ class _HomePageState extends State<HomePage> {
                               },
                               child: CheckboxListTile(
                                   title: Text(todoTitle),
-                                  subtitle: Text(todoDesc),
+                                  subtitle: Text('ID: $todoId'),
                                   controlAffinity: ListTileControlAffinity.leading,
                                   selected: todoStat,
                                   secondary: IconButton(
@@ -92,9 +97,8 @@ class _HomePageState extends State<HomePage> {
                                             MaterialPageRoute(
                                                 builder: (context) => AddTodo(
                                                   todoId: todoId,
+                                                  // todoUserId: todoUserId,
                                                   todoTitle: todoTitle,
-                                                  todoDesc: todoDesc,
-                                                  todoDateTime: todoDate,
                                                   todoUpdate: true,
                                                   todoStat: todoStat,
                                                 )));

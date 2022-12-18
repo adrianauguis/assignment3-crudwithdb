@@ -7,9 +7,8 @@ import 'model/todo_model.dart';
 
 class AddTodo extends StatefulWidget {
   int? todoId;
+  int? todoUserId;
   String? todoTitle;
-  String? todoDesc;
-  String? todoDateTime;
   bool? todoUpdate;
   bool? todoStat;
 
@@ -17,8 +16,7 @@ class AddTodo extends StatefulWidget {
       {Key? key,
       this.todoId,
       this.todoTitle,
-      this.todoDesc,
-      this.todoDateTime,
+      this.todoUserId,
       this.todoUpdate,
       this.todoStat})
       : super(key: key);
@@ -59,7 +57,6 @@ class _AddTodoState extends State<AddTodo> {
     }
 
     final title = TextEditingController(text: widget.todoTitle);
-    final desc = TextEditingController(text: widget.todoDesc);
     return Scaffold(
       appBar: AppBar(
         title: Text(appTitle),
@@ -83,23 +80,10 @@ class _AddTodoState extends State<AddTodo> {
                 },
               ),
               const SizedBox(height: 5),
-              TextFormField(
-                controller: desc,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
-                    border: OutlineInputBorder(), hintText: "Description"),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Pleas Enter Some Text";
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 5),
               DropdownButtonFormField(
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
-                  labelText: "Status",
+                  labelText: "Completed?",
                 ),
                   items: const [
                 DropdownMenuItem(value: 'Yes', child: Text('Yes')),
@@ -127,29 +111,21 @@ class _AddTodoState extends State<AddTodo> {
                       if (widget.todoUpdate == true) {
                         dbProvider!.updateTodo(TodoModel(
                             id: widget.todoId,
+                            // userId:widget.todoUserId,
                             title: title.text,
-                            desc: desc.text,
-                            status: stat,
-                            dateTime: DateFormat('yMd')
-                                .add_jm()
-                                .format(DateTime.now())
-                                .toString()));
+                          completed: stat,
+                            ));
                       } else {
                         dbProvider!.insertTodo(TodoModel(
                             title: title.text,
-                            desc: desc.text,
-                            status: stat,
-                            dateTime: DateFormat('yMd')
-                                .add_jm()
-                                .format(DateTime.now())
-                                .toString()));
+                          completed: stat,
+                            ));
                       }
                       Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const HomePage()));
                       title.clear();
-                      desc.clear();
                     }
                   },
                   child: const Text('Submit'))

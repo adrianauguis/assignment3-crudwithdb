@@ -1,29 +1,25 @@
 class TodoModel {
   final int? id;
+  // final int? userId;
   final String? title;
-  final String? desc;
-  final String? dateTime;
-  final int? status;
+  final int? completed;
 
   TodoModel({this.id,
     this.title,
-    this.desc,
-    this.dateTime,
-    this.status});
+    // this.userId,
+    this.completed});
 
   factory TodoModel.fromMap(Map<String, dynamic> json) => TodoModel(
+      // userId: json["userId"],
     id: json["id"],
     title: json["title"],
-    desc: json["desc"],
-    dateTime: json["dateTime"],
-    status: json["status"],
+    completed: json["completed"]
   );
 
   Map<String, dynamic> toMap() => {
+    // "userId": userId,
     "id": id,
     "title": title,
-    "desc": desc,
-    "dateTime": dateTime,
-    "status" : status
+    "completed": completed
   };
 }
