@@ -7,7 +7,6 @@ import 'model/todo_model.dart';
 
 class AddTodo extends StatefulWidget {
   int? todoId;
-  int? todoUserId;
   String? todoTitle;
   bool? todoUpdate;
   bool? todoStat;
@@ -16,7 +15,6 @@ class AddTodo extends StatefulWidget {
       {Key? key,
       this.todoId,
       this.todoTitle,
-      this.todoUserId,
       this.todoUpdate,
       this.todoStat})
       : super(key: key);

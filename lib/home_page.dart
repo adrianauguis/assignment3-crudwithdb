@@ -13,31 +13,22 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DBProvider? dbProvider;
-  late Future<List<TodoModel>> dataList;
+  Future<List<TodoModel>>? dataList;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     dbProvider = DBProvider();
-    loadFromApi();
-    loadData();
   }
 
-  loadData() {
-    dataList = dbProvider!.getTodoList();
+  loadData() async {
+    dataList = (await dbProvider!.getTodoList()) as Future<List<TodoModel>>;
   }
 
   loadFromApi() async {
     var apiProvider = TodoApiProvider();
     await apiProvider.getAllTodos();
-  }
-
-  bool toBoolean(String str, [bool strict = false]) {
-    if (strict == true) {
-      return str == '1' || str == 'true';
-    }
-    return str != '0' && str != 'false' && str != '';
   }
 
   @override
@@ -48,6 +39,12 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Todo'),
         centerTitle: true,
         leading: const Icon(Icons.code),
+        actions: [
+          IconButton(onPressed: (){
+            loadFromApi();
+            loadData();
+          }, icon: const Icon(Icons.update))
+        ],
       ),
       body: Column(
         children: [
@@ -71,8 +68,6 @@ class _HomePageState extends State<HomePage> {
                             int todoId = snapshot.data![index].id!.toInt();
                             String todoTitle =
                                 snapshot.data![index].title!.toString();
-                            // int todoUserId =
-                            //     snapshot.data![index].userId!.toInt();
                             int? todoCompleted = snapshot.data![index].completed!.toInt();
                             todoStat = (todoCompleted == 1)? true : false;
                             return Dismissible(
@@ -97,7 +92,6 @@ class _HomePageState extends State<HomePage> {
                                             MaterialPageRoute(
                                                 builder: (context) => AddTodo(
                                                   todoId: todoId,
-                                                  // todoUserId: todoUserId,
                                                   todoTitle: todoTitle,
                                                   todoUpdate: true,
                                                   todoStat: todoStat,
@@ -112,27 +106,6 @@ class _HomePageState extends State<HomePage> {
                                 },
                               ),
                             );
-                            // trailing: Row(
-                            //   children: <Widget>[
-                            //     IconButton(onPressed: (){
-                            //       Navigator.push(context,
-                            //           MaterialPageRoute(
-                            //               builder: (context)=>AddTodo(
-                            //                 todoId: todoId,
-                            //                 todoTitle: todoTitle,
-                            //                 todoDesc: todoDesc,
-                            //                 todoDateTime: todoDate,
-                            //               )));
-                            //     }, icon: const Icon(Icons.edit)),
-                            //     IconButton(onPressed: (){
-                            //       setState(() {
-                            //         dbProvider!.deleteTodo(todoId);
-                            //         dataList = dbProvider!.getTodoList();
-                            //         snapshot.data!.remove(snapshot.data![index]);
-                            //       });
-                            //     }, icon: const Icon(Icons.delete))
-                            //   ],
-                            // ),
                           });
                     }
                   }))

@@ -49,6 +49,13 @@ class DBProvider {
     return await dbClient!.delete('mytodos', where: 'id = ?', whereArgs: [id]);
   }
 
+  Future<int> deleteAllTodos() async {
+    final dbClient = await database;
+    final res = await dbClient!.rawDelete('DELETE * FROM mytodos');
+
+    return res;
+  }
+
   Future<int> updateTodo(TodoModel todoModel) async {
     var dbClient = await database;
     return await dbClient!.update('mytodos', todoModel.toMap(),
