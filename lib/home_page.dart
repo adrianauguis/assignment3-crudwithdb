@@ -13,7 +13,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DBProvider? dbProvider;
-  Future <List<TodoModel>>? dataList;
+  late Future<List<TodoModel>> dataList;
+  var isLoading = false;
 
   @override
   void initState() {
@@ -22,97 +23,114 @@ class _HomePageState extends State<HomePage> {
     dbProvider = DBProvider();
   }
 
-  loadData(){
+  buildTodoListView() {
     dataList = dbProvider!.getTodoList();
+    return Column(
+      children: [
+        Expanded(
+            child: FutureBuilder(
+                future: dataList,
+                builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
+                  if (!snapshot.hasData || snapshot.data == null) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (snapshot.data!.length == 0) {
+                    return const Center(
+                      child: Text('No Todos'),
+                    );
+                  } else {
+                    return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data?.length,
+                        itemBuilder: (context, index) {
+                          int todoId = snapshot.data![index].id!.toInt();
+                          String todoTitle =
+                          snapshot.data![index].title!.toString();
+                          int? todoCompleted =
+                          snapshot.data![index].completed!.toInt();
+                          bool todoStat =
+                          (todoCompleted == 1) ? true : false;
+                          return Dismissible(
+                            key: UniqueKey(),
+                            background: Container(color: Colors.red),
+                            onDismissed: (DismissDirection direction) {
+                              setState(() {
+                                dbProvider!.deleteTodo(todoId);
+                                dataList = dbProvider!.getTodoList();
+                                snapshot.data!
+                                    .remove(snapshot.data![index]);
+                              });
+                            },
+                            child: CheckboxListTile(
+                              title: Text(todoTitle),
+                              subtitle: Text('ID: $todoId'),
+                              controlAffinity:
+                              ListTileControlAffinity.leading,
+                              selected: todoStat,
+                              value: todoStat,
+                              onChanged: (value) {
+                                setState(() {
+                                  todoStat = value!;
+                                });
+                              },
+                              secondary: IconButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => AddTodo(
+                                              todoId: todoId,
+                                              todoTitle: todoTitle,
+                                              todoUpdate: true,
+                                              todoStat: todoStat,
+                                            )));
+                                  },
+                                  icon: const Icon(Icons.edit)),
+                            ),
+                          );
+                        });
+                  }
+                }))
+      ],
+    );
   }
 
   loadFromApi() async {
+    setState(() {
+      isLoading = true;
+    });
+
     var apiProvider = TodoApiProvider();
     await apiProvider.getAllTodos();
+
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    bool todoStat;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo'),
         centerTitle: true,
         leading: const Icon(Icons.code),
         actions: [
-          IconButton(onPressed: (){
-            setState((){
-              loadFromApi();
-              loadData();
-            });
-          }, icon: const Icon(Icons.update))
+          IconButton(
+              onPressed: () async {
+                await loadFromApi();
+              },
+              icon: const Icon(Icons.settings_input_antenna))
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-              child: FutureBuilder(
-                  future: dataList,
-                  builder: (context, AsyncSnapshot<List<TodoModel>> snapshot) {
-                    if (!snapshot.hasData || snapshot.data == null) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.data!.length == 0) {
-                      return const Center(
-                        child: Text('No Todos'),
-                      );
-                    } else {
-                      return ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: snapshot.data?.length,
-                          itemBuilder: (context, index) {
-                            int todoId = snapshot.data![index].id!.toInt();
-                            String todoTitle =
-                                snapshot.data![index].title!.toString();
-                            int? todoCompleted = snapshot.data![index].completed!.toInt();
-                            todoStat = (todoCompleted == 1)? true : false;
-                            return Dismissible(
-                              key: UniqueKey(),
-                              background: Container(color: Colors.red),
-                              onDismissed: (DismissDirection direction) {
-                                setState(() {
-                                  dbProvider!.deleteTodo(todoId);
-                                  dataList = dbProvider!.getTodoList();
-                                  snapshot.data!.remove(snapshot.data![index]);
-                                });
-                              },
-                              child: CheckboxListTile(
-                                  title: Text(todoTitle),
-                                  subtitle: Text('ID: $todoId'),
-                                  controlAffinity: ListTileControlAffinity.leading,
-                                  selected: todoStat,
-                                  secondary: IconButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => AddTodo(
-                                                  todoId: todoId,
-                                                  todoTitle: todoTitle,
-                                                  todoUpdate: true,
-                                                  todoStat: todoStat,
-                                                )));
-                                      },
-                                      icon: const Icon(Icons.edit)),
-                                value: todoStat,
-                                onChanged: (value) {
-                                    setState(() {
-                                      todoStat = value!;
-                                    });
-                                },
-                              ),
-                            );
-                          });
-                    }
-                  }))
-        ],
-      ),
+      body: isLoading == true
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : buildTodoListView(),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
