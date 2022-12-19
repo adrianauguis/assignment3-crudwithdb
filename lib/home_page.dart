@@ -13,7 +13,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DBProvider? dbProvider;
-  Future<List<TodoModel>>? dataList;
+  Future <List<TodoModel>>? dataList;
 
   @override
   void initState() {
@@ -22,8 +22,8 @@ class _HomePageState extends State<HomePage> {
     dbProvider = DBProvider();
   }
 
-  loadData() async {
-    dataList = (await dbProvider!.getTodoList()) as Future<List<TodoModel>>;
+  loadData(){
+    dataList = dbProvider!.getTodoList();
   }
 
   loadFromApi() async {
@@ -41,8 +41,10 @@ class _HomePageState extends State<HomePage> {
         leading: const Icon(Icons.code),
         actions: [
           IconButton(onPressed: (){
-            loadFromApi();
-            loadData();
+            setState((){
+              loadFromApi();
+              loadData();
+            });
           }, icon: const Icon(Icons.update))
         ],
       ),

@@ -56,6 +56,13 @@ class DBProvider {
     return res;
   }
 
+  Future<void> deleteDatabase() async{
+    io.Directory documentDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentDirectory.path, 'Todos.db');
+    databaseFactory.deleteDatabase(path);
+  }
+
+
   Future<int> updateTodo(TodoModel todoModel) async {
     var dbClient = await database;
     return await dbClient!.update('mytodos', todoModel.toMap(),
