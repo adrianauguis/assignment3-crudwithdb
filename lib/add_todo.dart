@@ -1,7 +1,6 @@
 import 'package:assignment_auguis_test/home_page.dart';
 import 'package:assignment_auguis_test/provider/db_provider.dart';
 import 'package:flutter/material.dart';
-
 import 'model/todo_model.dart';
 
 class AddTodo extends StatefulWidget {

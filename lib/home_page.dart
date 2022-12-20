@@ -100,7 +100,6 @@ class _HomePageState extends State<HomePage> {
 
     var apiProvider = TodoApiProvider();
     await apiProvider.getAllTodos();
-
     await Future.delayed(const Duration(seconds: 1));
 
     setState(() {
