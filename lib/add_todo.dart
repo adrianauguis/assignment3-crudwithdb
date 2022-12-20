@@ -112,7 +112,7 @@ class _AddTodoState extends State<AddTodo> {
                           completed: stat,
                         ));
                       }
-                       Navigator.push(
+                      Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => const HomePage()));

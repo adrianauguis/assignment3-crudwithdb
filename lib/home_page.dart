@@ -46,11 +46,10 @@ class _HomePageState extends State<HomePage> {
                         itemBuilder: (context, index) {
                           int todoId = snapshot.data![index].id!.toInt();
                           String todoTitle =
-                          snapshot.data![index].title!.toString();
+                              snapshot.data![index].title!.toString();
                           int? todoCompleted =
-                          snapshot.data![index].completed!.toInt();
-                          bool todoStat =
-                          (todoCompleted == 1) ? true : false;
+                              snapshot.data![index].completed!.toInt();
+                          bool todoStat = (todoCompleted == 1) ? true : false;
                           return Dismissible(
                             key: UniqueKey(),
                             background: Container(color: Colors.red),
@@ -58,15 +57,13 @@ class _HomePageState extends State<HomePage> {
                               setState(() {
                                 dbProvider!.deleteTodo(todoId);
                                 dataList = dbProvider!.getTodoList();
-                                snapshot.data!
-                                    .remove(snapshot.data![index]);
+                                snapshot.data!.remove(snapshot.data![index]);
                               });
                             },
                             child: CheckboxListTile(
                               title: Text(todoTitle),
                               subtitle: Text('ID: $todoId'),
-                              controlAffinity:
-                              ListTileControlAffinity.leading,
+                              controlAffinity: ListTileControlAffinity.leading,
                               selected: todoStat,
                               value: todoStat,
                               onChanged: (value) {
@@ -80,11 +77,11 @@ class _HomePageState extends State<HomePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => AddTodo(
-                                              todoId: todoId,
-                                              todoTitle: todoTitle,
-                                              todoUpdate: true,
-                                              todoStat: todoStat,
-                                            )));
+                                                  todoId: todoId,
+                                                  todoTitle: todoTitle,
+                                                  todoUpdate: true,
+                                                  todoStat: todoStat,
+                                                )));
                                   },
                                   icon: const Icon(Icons.edit)),
                             ),
