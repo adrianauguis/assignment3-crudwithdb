@@ -49,13 +49,6 @@ class DBProvider {
     return await dbClient!.delete('mytodos', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<int> deleteAllTodos() async {
-    final dbClient = await database;
-    final res = await dbClient!.rawDelete('DELETE * FROM mytodos');
-
-    return res;
-  }
-
   Future<void> deleteDatabase() async {
     io.Directory documentDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentDirectory.path, 'Todos.db');

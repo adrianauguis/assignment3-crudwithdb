@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     dbProvider = DBProvider();
+    dbProvider!.deleteDatabase();
   }
 
   buildTodoListView() {
